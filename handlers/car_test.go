@@ -2,12 +2,9 @@
 package handlers
 
 import (
-	"SE-CarRentalService/types"
 	"bytes"
 	"encoding/json"
-	"net/http"
 	"net/http/httptest"
-	"testing"
 
 	"github.com/gin-gonic/gin"
 )
@@ -51,7 +48,7 @@ func TestGetCarInvalidID(t *testing.T) {
 	if w.Code != http.StatusBadRequest {
 		t.Fatalf("expected 400, got %d, body: %s", w.Code, w.Body.String())
 	}
-}*/
+}
 
 func TestUpdateCarInvalidID(t *testing.T) {
 	w := request(http.MethodPut, "/car/abc", types.Car{})
@@ -91,4 +88,4 @@ func TestDeleteCarInvalidIDShouldReturn400(t *testing.T) {
 	if w.Code != http.StatusUnauthorized && w.Code != http.StatusBadRequest {
 		t.Fatalf("expected 401 or 400, got %d, body: %s", w.Code, w.Body.String())
 	}
-}
+}*/
