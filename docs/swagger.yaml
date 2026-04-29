@@ -1,0 +1,446 @@
+definitions:
+  db.Account:
+    properties:
+      currency:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      is_admin:
+        type: boolean
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  db.LoginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  types.Car:
+    properties:
+      accountId:
+        type: integer
+      brand:
+        type: string
+      collectAt:
+        type: string
+      id:
+        type: integer
+      model:
+        type: string
+      price:
+        type: integer
+      ps:
+        type: integer
+      year:
+        type: integer
+    type: object
+  types.CreateAccountRequest:
+    properties:
+      currency:
+        $ref: '#/definitions/types.Currency'
+      email:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - currency
+    - email
+    - password
+    - username
+    type: object
+  types.CreateCarRequest:
+    properties:
+      accountId:
+        type: integer
+      brand:
+        type: string
+      collectAt:
+        type: string
+      model:
+        type: string
+      price:
+        type: integer
+      ps:
+        type: integer
+      year:
+        type: integer
+    required:
+    - accountId
+    - brand
+    - collectAt
+    - model
+    - price
+    - ps
+    - year
+    type: object
+  types.Currency:
+    enum:
+    - USD
+    - JPY
+    - CZK
+    - DKK
+    - GBP
+    - HUF
+    - PLN
+    - RON
+    - SEK
+    - CHF
+    - ISK
+    - NOK
+    - TRY
+    - AUD
+    - BRL
+    - CAD
+    - CNY
+    - HKD
+    - IDR
+    - ILS
+    - INR
+    - KRW
+    - MXN
+    - MYR
+    - NZD
+    - PHP
+    - SGD
+    - THB
+    - ZAR
+    - EUR
+    type: string
+    x-enum-varnames:
+    - USD
+    - JPY
+    - CZK
+    - DKK
+    - GBP
+    - HUF
+    - PLN
+    - RON
+    - SEK
+    - CHF
+    - ISK
+    - NOK
+    - TRY
+    - AUD
+    - BRL
+    - CAD
+    - CNY
+    - HKD
+    - IDR
+    - ILS
+    - INR
+    - KRW
+    - MXN
+    - MYR
+    - NZD
+    - PHP
+    - SGD
+    - THB
+    - ZAR
+    - EUR
+info:
+  contact: {}
+paths:
+  /account:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new account and returns token + account
+      parameters:
+      - description: Account data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/types.CreateAccountRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create account
+      tags:
+      - account
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing account
+      parameters:
+      - description: Updated account
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/db.Account'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: jwt token
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update account
+      tags:
+      - account
+  /account/{id}:
+    get:
+      description: Returns 200 if the account token is valid
+      parameters:
+      - description: Account ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get account by id
+      tags:
+      - account
+  /car:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new car
+      parameters:
+      - description: Car data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/types.CreateCarRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.Car'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create car
+      tags:
+      - car
+  /car/{id}:
+    delete:
+      description: Deletes a car by id
+      parameters:
+      - description: Car ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: integer
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete car
+      tags:
+      - car
+    get:
+      description: Returns one car by id
+      parameters:
+      - description: Car ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.Car'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get car by id
+      tags:
+      - car
+    put:
+      consumes:
+      - application/json
+      description: Updates a car by id
+      parameters:
+      - description: Car ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated car
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/types.Car'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.Car'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update car
+      tags:
+      - car
+  /cars:
+    get:
+      description: Returns all cars, optionally converted to the account currency
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/types.Car'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all cars
+      tags:
+      - car
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates a user and returns a JWT token
+      parameters:
+      - description: Login credentials
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/db.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: jwt token
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Login
+      tags:
+      - account
+swagger: "2.0"
