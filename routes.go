@@ -17,7 +17,7 @@ func SetupRouter() {
 
 	r.Use(cors.New(cors.Config{
 		AllowOrigins: []string{
-			"https://se-p1-web-application.niceforest-d0fde9b9.italynorth.azurecontainerapps.io",
+			"https://se-p2-web-application.niceforest-d0fde9b9.italynorth.azurecontainerapps.io/",
 		},
 		AllowMethods: []string{
 			http.MethodGet,
