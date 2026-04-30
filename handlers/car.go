@@ -112,7 +112,7 @@ func (h *CarHandler) CreateCar(c *gin.Context) {
 	account := response.Account
 	valid := response.Valid
 	strErr := response.Error
-	if !valid {
+	if !valid || !account.IsAdmin {
 		message := "invalid token"
 		if strErr != "" {
 			message = strErr
@@ -156,7 +156,7 @@ func (h *CarHandler) UpdateCar(c *gin.Context) {
 	account := response.Account
 	valid := response.Valid
 	strErr := response.Error
-	if !valid {
+	if !valid || !account.IsAdmin {
 		message := "invalid token"
 		if strErr != "" {
 			message = strErr
