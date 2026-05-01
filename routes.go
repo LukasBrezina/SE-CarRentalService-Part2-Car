@@ -5,6 +5,7 @@ import (
 	"SE-CarRentalService/handlers"
 	"SE-CarRentalService/services"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -16,9 +17,11 @@ import (
 func SetupRouter(grcpconnection *services.ConverterClient) {
 	r := gin.Default()
 
+	corsAddress := os.Getenv("CORS_ADDRESS")
+
 	r.Use(cors.New(cors.Config{
 		AllowOrigins: []string{
-			"https://se-p2-web-application--j942zdy.niceforest-d0fde9b9.italynorth.azurecontainerapps.io",
+			corsAddress,
 		},
 		AllowMethods: []string{
 			http.MethodGet,
