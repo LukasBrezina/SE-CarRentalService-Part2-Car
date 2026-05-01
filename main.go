@@ -4,7 +4,7 @@ import (
 	"SE-CarRentalService/db"
 	"SE-CarRentalService/handlers"
 	"SE-CarRentalService/rabbitMQ"
-	currency "SE-CarRentalService/services"
+	"SE-CarRentalService/services"
 	"log"
 
 	"github.com/joho/godotenv"
@@ -19,14 +19,12 @@ func main() {
 		log.Println(err)
 	}
 
-	db.Connect()
+	GRCPConnection := services.NewConverterClientRetry()
+	db.Connect(GRCPConnection)
 	handlers.RabbitConnection, handlers.RabbitChannel, err = rabbitMQ.Connect()
-
-	converter := currency.NewConverterClientRetry()
-	defer converter.Close()
 
 	if err != nil {
 		log.Println(err)
 	}
-	SetupRouter()
+	SetupRouter(GRCPConnection)
 }

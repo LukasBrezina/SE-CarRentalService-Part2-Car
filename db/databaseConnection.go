@@ -1,6 +1,7 @@
 package db
 
 import (
+	"SE-CarRentalService/services"
 	"database/sql"
 	"log"
 	"os"
@@ -9,8 +10,10 @@ import (
 )
 
 var DATABASE *sql.DB
+var GRCPConnection *services.ConverterClient
 
-func Connect() {
+func Connect(grcpConnection *services.ConverterClient) {
+	GRCPConnection = grcpConnection
 	connStr := os.Getenv("DB_CONN")
 	if connStr == "" {
 		log.Println("DATABASE_URL is empty")

@@ -3,6 +3,7 @@ package main
 import (
 	_ "SE-CarRentalService/docs"
 	"SE-CarRentalService/handlers"
+	"SE-CarRentalService/services"
 	"net/http"
 	"time"
 
@@ -12,7 +13,7 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-func SetupRouter() {
+func SetupRouter(grcpconnection *services.ConverterClient) {
 	r := gin.Default()
 
 	r.Use(cors.New(cors.Config{
@@ -39,7 +40,7 @@ func SetupRouter() {
 		MaxAge:           12 * time.Hour,
 	}))
 
-	carHandler := handlers.NewCarHandler()
+	carHandler := handlers.NewCarHandler(grcpconnection)
 
 	r.GET("/swagger/*any", ginSwagger.CustomWrapHandler(&ginSwagger.Config{
 		URL: "doc.json",

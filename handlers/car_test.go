@@ -13,7 +13,7 @@ func setupCarTestRouter() *gin.Engine {
 	gin.SetMode(gin.TestMode)
 
 	r := gin.New()
-	h := NewCarHandler()
+	h := NewCarHandler(GRCPConnection)
 
 	r.GET("/cars", h.GetCars)
 	r.GET("/car/:id", h.GetCar)

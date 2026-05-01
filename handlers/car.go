@@ -15,8 +15,10 @@ type CarHandler struct{}
 
 var RabbitConnection *amqp.Connection
 var RabbitChannel *amqp.Channel
+var GRCPConnection *services.ConverterClient
 
-func NewCarHandler() *CarHandler {
+func NewCarHandler(grcpconnection *services.ConverterClient) *CarHandler {
+	GRCPConnection = grcpconnection
 	return &CarHandler{}
 }
 
@@ -48,8 +50,8 @@ func (h *CarHandler) GetCars(c *gin.Context) {
 	}
 	fmt.Println(cars)
 	for i := range cars {
-		newPrice, _ := services.ConvertCurrency("USD", cars[i].Price, currency)
-		cars[i].Price = newPrice
+		newPrice, _, _ := GRCPConnection.ConvertCurrency("USD", float64(cars[i].Price), currency)
+		cars[i].Price = float32(newPrice)
 	}
 	c.JSON(200, cars)
 }
@@ -89,7 +91,9 @@ func (h *CarHandler) GetCar(c *gin.Context) {
 		return
 	}
 
-	car.Price, _ = services.ConvertCurrency("USD", car.Price, currency)
+	newPrice, _, _ := GRCPConnection.ConvertCurrency("USD", float64(car.Price), currency)
+
+	car.Price = float32(newPrice)
 
 	c.JSON(200, car)
 }

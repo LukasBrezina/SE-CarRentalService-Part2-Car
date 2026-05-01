@@ -1,7 +1,6 @@
 package db
 
 import (
-	"SE-CarRentalService/services"
 	"SE-CarRentalService/types"
 	"database/sql"
 	"fmt"
@@ -72,7 +71,7 @@ func GetCarByID(id int) (types.Car, error) {
 func CreateCar(c types.CreateCarRequest, currency string) (types.Car, error) {
 	database := DATABASE
 	var newCar types.Car
-	price, _ := services.ConvertCurrency(currency, c.Price, "USD")
+	price, _, _ := GRCPConnection.ConvertCurrency(currency, float64(c.Price), "USD")
 	err := database.QueryRow(`
 		INSERT INTO car (model, brand, collectAt, accountId, year, price, ps)
 		VALUES ($1, $2, $3, $4, $5, $6, $7)
@@ -105,7 +104,7 @@ func UpdateCar(id int, c types.Car, account types.Account) error {
 	database := DATABASE
 	var result sql.Result
 	var err error
-	price, _ := services.ConvertCurrency(account.Currency, c.Price, "USD")
+	price, _, _ := GRCPConnection.ConvertCurrency(account.Currency, float64(c.Price), "USD")
 	if account.IsAdmin {
 		result, err = database.Exec(`
         UPDATE car
