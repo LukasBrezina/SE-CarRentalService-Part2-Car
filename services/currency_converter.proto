@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package currency_converter;
+
+option go_package = "my-project/proto;proto";
+
+service CurrencyConverterService {
+  rpc ConvertCurrency(ConvertCurrencyRequest) returns (ConvertCurrencyReply) {}
+}
+
+message ConvertCurrencyRequest {
+  string initial_currency = 1;
+  double initial_amount = 2;
+  string target_currency = 3;
+}
+
+message ConvertCurrencyReply {
+  double converted_amount = 1;
+  string target_currency = 2;
+}
