@@ -4,7 +4,7 @@ import (
 	"SE-CarRentalService/rabbitMQ"
 	"SE-CarRentalService/services"
 	"SE-CarRentalService/types"
-	"fmt"
+	"log"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -48,11 +48,13 @@ func (h *CarHandler) GetCars(c *gin.Context) {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
-	fmt.Println(cars)
+	log.Println(cars)
 	for i := range cars {
 		newPrice, _, _ := GRCPConnection.ConvertCurrency("USD", float64(cars[i].Price), currency)
+		log.Println(newPrice)
 		cars[i].Price = float32(newPrice)
 	}
+	log.Println(cars)
 	c.JSON(200, cars)
 }
 

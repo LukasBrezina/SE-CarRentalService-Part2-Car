@@ -36,7 +36,6 @@ func GetCarsFromDatabase() ([]types.Car, error) {
 		if err != nil {
 			return nil, err
 		}
-		fmt.Println(car.Price)
 		carList = append(carList, car)
 	}
 
