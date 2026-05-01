@@ -50,7 +50,11 @@ func (h *CarHandler) GetCars(c *gin.Context) {
 	}
 	log.Println(cars)
 	for i := range cars {
-		newPrice, _, _ := GRCPConnection.ConvertCurrency("USD", float64(cars[i].Price), currency)
+		newPrice, _, err := GRCPConnection.ConvertCurrency("USD", float64(cars[i].Price), currency)
+		if err != nil {
+			log.Println(err)
+			c.JSON(400, gin.H{"error": err.Error()})
+		}
 		log.Println(newPrice)
 		cars[i].Price = float32(newPrice)
 	}
