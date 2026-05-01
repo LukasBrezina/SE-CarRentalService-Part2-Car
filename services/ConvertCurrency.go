@@ -3,12 +3,13 @@ package services
 import (
 	"SE-CarRentalService/services/proto"
 	"context"
+	"crypto/tls"
 	"fmt"
 	"os"
 	"time"
 
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/credentials"
 )
 
 type ConverterClient struct {
@@ -32,20 +33,15 @@ func NewConverterClientRetry() *ConverterClient {
 func NewConverterClient() (*ConverterClient, error) {
 	host := os.Getenv("GRPCHOST")
 	port := os.Getenv("GRPCPORT")
-
-	if host == "" {
-		return nil, fmt.Errorf("GRPCHOST is not set")
-	}
-
-	if port == "" {
-		return nil, fmt.Errorf("GRPCPORT is not set")
-	}
-
 	target := host + ":" + port
+
+	creds := credentials.NewTLS(&tls.Config{
+		ServerName: host,
+	})
 
 	conn, err := grpc.NewClient(
 		target,
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithTransportCredentials(creds),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create gRPC client: %w", err)
