@@ -9,11 +9,12 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	amqp "github.com/rabbitmq/amqp091-go"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-func SetupRouter() {
+func SetupRouter(rabbitConnection *amqp.Connection, RabbitChannel *amqp.Channel) {
 	r := gin.Default()
 
 	corsAddress := os.Getenv("CORS_ADDRESS")
@@ -42,7 +43,7 @@ func SetupRouter() {
 		MaxAge:           12 * time.Hour,
 	}))
 
-	carHandler := handlers.NewCarHandler()
+	carHandler := handlers.NewCarHandler(rabbitConnection, RabbitChannel)
 
 	r.GET("/swagger/*any", ginSwagger.CustomWrapHandler(&ginSwagger.Config{
 		URL: "doc.json",

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"SE-CarRentalService/rabbitMQ"
+	"SE-CarRentalService/services"
 	"SE-CarRentalService/types"
 	"log"
 	"strconv"
@@ -10,13 +11,18 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
-type CarHandler struct{}
+type CarHandler struct {
+	RabbitConnection *amqp.Connection
+	RabbitChannel    *amqp.Channel
+	GRCPConnection   *services.ConverterClient
+}
 
-var RabbitConnection *amqp.Connection
-var RabbitChannel *amqp.Channel
+func NewCarHandler(RabbitConnection *amqp.Connection, RabbitChannel *amqp.Channel) *CarHandler {
 
-func NewCarHandler() *CarHandler {
-	return &CarHandler{}
+	return &CarHandler{
+		RabbitConnection: RabbitConnection,
+		RabbitChannel:    RabbitChannel,
+	}
 }
 
 // GetCars godoc
@@ -29,7 +35,7 @@ func NewCarHandler() *CarHandler {
 // @Router /cars [get]
 func (h *CarHandler) GetCars(c *gin.Context) {
 
-	response, err := verifyToken(RabbitChannel, c.Request.Header.Get("Authorization"))
+	response, err := verifyToken(h.RabbitChannel, c.Request.Header.Get("Authorization"))
 	if err != nil {
 		log.Println("Error verifying token:", err)
 		c.JSON(400, gin.H{"error": "invalid token"})
@@ -82,7 +88,7 @@ func (h *CarHandler) GetCar(c *gin.Context) {
 		return
 	}
 
-	response, _ := verifyToken(RabbitChannel, c.Request.Header.Get("Authorization"))
+	response, _ := verifyToken(h.RabbitChannel, c.Request.Header.Get("Authorization"))
 
 	account := response.Account
 	valid := response.Valid
@@ -120,7 +126,7 @@ func (h *CarHandler) GetCar(c *gin.Context) {
 // @Router /car [post]
 func (h *CarHandler) CreateCar(c *gin.Context) {
 
-	response, _ := verifyToken(RabbitChannel, c.Request.Header.Get("Authorization"))
+	response, _ := verifyToken(h.RabbitChannel, c.Request.Header.Get("Authorization"))
 
 	account := response.Account
 	valid := response.Valid
@@ -168,7 +174,7 @@ func (h *CarHandler) UpdateCar(c *gin.Context) {
 		c.JSON(400, gin.H{"error": "invalid id"})
 		return
 	}
-	response, _ := verifyToken(RabbitChannel, c.Request.Header.Get("Authorization"))
+	response, _ := verifyToken(h.RabbitChannel, c.Request.Header.Get("Authorization"))
 
 	account := response.Account
 	valid := response.Valid
@@ -217,7 +223,7 @@ func (h *CarHandler) DeleteCar(c *gin.Context) {
 		c.JSON(400, gin.H{"error": "invalid id"})
 	}
 
-	response, _ := rabbitMQ.CheckTokenViaRabbit(RabbitChannel, c.Request.Header.Get("Authorization"))
+	response, _ := rabbitMQ.CheckTokenViaRabbit(h.RabbitChannel, c.Request.Header.Get("Authorization"))
 
 	account := response.Account
 	valid := response.Valid
