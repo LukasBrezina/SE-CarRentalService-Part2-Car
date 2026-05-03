@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -25,7 +26,7 @@ func NewConverterClientRetry() *ConverterClient {
 			return converter
 		}
 
-		fmt.Printf("Failed to connect to currency converter, retrying in 3 seconds: %v\n", err)
+		log.Printf("Failed to connect to currency converter, retrying in 3 seconds: %v\n", err)
 		time.Sleep(3 * time.Second)
 	}
 }

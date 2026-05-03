@@ -4,6 +4,7 @@ import (
 	"SE-CarRentalService/types"
 	"database/sql"
 	"fmt"
+	"log"
 )
 
 func GetCarsFromDatabase() ([]types.Car, error) {
@@ -70,8 +71,12 @@ func GetCarByID(id int) (types.Car, error) {
 func CreateCar(c types.CreateCarRequest, currency string) (types.Car, error) {
 	database := DATABASE
 	var newCar types.Car
-	price, _, _ := GRCPConnection.ConvertCurrency(currency, float64(c.Price), "USD")
-	err := database.QueryRow(`
+	price, _, err := GRCPConnection.ConvertCurrency(currency, float64(c.Price), "USD")
+	if err != nil {
+		log.Fatal(err)
+		return types.Car{}, err
+	}
+	err = database.QueryRow(`
 		INSERT INTO car (model, brand, collectAt, accountId, year, price, ps)
 		VALUES ($1, $2, $3, $4, $5, $6, $7)
 		RETURNING id, model, brand, collectAt, accountId, year, price, ps
@@ -103,7 +108,13 @@ func UpdateCar(id int, c types.Car, account types.Account) error {
 	database := DATABASE
 	var result sql.Result
 	var err error
-	price, _, _ := GRCPConnection.ConvertCurrency(account.Currency, float64(c.Price), "USD")
+	price, _, err := GRCPConnection.ConvertCurrency(account.Currency, float64(c.Price), "USD")
+
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+
 	if account.IsAdmin {
 		result, err = database.Exec(`
         UPDATE car
@@ -145,7 +156,7 @@ func UpdateCar(id int, c types.Car, account types.Account) error {
 	}
 
 	if rows == 0 {
-		return fmt.Errorf("car not found")
+		return fmt.Errorf("car not found or already rented")
 	}
 
 	return nil

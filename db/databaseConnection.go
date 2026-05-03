@@ -16,9 +16,9 @@ func Connect(grcpConnection *services.ConverterClient) {
 	GRCPConnection = grcpConnection
 	connStr := os.Getenv("DB_CONN")
 	if connStr == "" {
-		log.Println("DATABASE_URL is empty")
+		log.Println("DB_CONN is empty")
 	} else {
-		log.Println("DATABASE_URL is set")
+		log.Println("DB_CONN is set")
 	}
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {

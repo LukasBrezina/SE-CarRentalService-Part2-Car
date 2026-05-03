@@ -32,7 +32,12 @@ func NewCarHandler(grcpconnection *services.ConverterClient) *CarHandler {
 // @Router /cars [get]
 func (h *CarHandler) GetCars(c *gin.Context) {
 
-	response, _ := rabbitMQ.CheckTokenViaRabbit(RabbitChannel, c.Request.Header.Get("Authorization"))
+	response, err := verifyToken(RabbitChannel, c.Request.Header.Get("Authorization"))
+	if err != nil {
+		log.Println("Error verifying token:", err)
+		c.JSON(400, gin.H{"error": "invalid token"})
+		return
+	}
 
 	account := response.Account
 	valid := response.Valid
@@ -48,18 +53,19 @@ func (h *CarHandler) GetCars(c *gin.Context) {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
-	log.Println(cars)
+	var carsToSend []types.Car
 	for i := range cars {
-		newPrice, _, err := GRCPConnection.ConvertCurrency("USD", float64(cars[i].Price), currency)
+		newPrice, _, err := convertCurrency("USD", float64(cars[i].Price), currency)
 		if err != nil {
 			log.Println(err)
-			c.JSON(400, gin.H{"error": err.Error()})
+			log.Println(cars[i])
+			continue
 		}
 		log.Println(newPrice)
 		cars[i].Price = float32(newPrice)
+		carsToSend = append(carsToSend, cars[i])
 	}
-	log.Println(cars)
-	c.JSON(200, cars)
+	c.JSON(200, carsToSend)
 }
 
 // GetCar godoc
@@ -73,7 +79,13 @@ func (h *CarHandler) GetCars(c *gin.Context) {
 // @Router /car/{id} [get]
 func (h *CarHandler) GetCar(c *gin.Context) {
 
-	response, _ := rabbitMQ.CheckTokenViaRabbit(RabbitChannel, c.Request.Header.Get("Authorization"))
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(400, gin.H{"error": "invalid id"})
+		return
+	}
+
+	response, _ := verifyToken(RabbitChannel, c.Request.Header.Get("Authorization"))
 
 	account := response.Account
 	valid := response.Valid
@@ -85,19 +97,13 @@ func (h *CarHandler) GetCar(c *gin.Context) {
 		currency = "EUR"
 	}
 
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.JSON(400, gin.H{"error": "invalid id"})
-		return
-	}
-
 	car, err := getCarByID(id)
 	if err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
 
-	newPrice, _, _ := GRCPConnection.ConvertCurrency("USD", float64(car.Price), currency)
+	newPrice, _, _ := convertCurrency("USD", float64(car.Price), currency)
 
 	car.Price = float32(newPrice)
 
@@ -117,7 +123,7 @@ func (h *CarHandler) GetCar(c *gin.Context) {
 // @Router /car [post]
 func (h *CarHandler) CreateCar(c *gin.Context) {
 
-	response, _ := rabbitMQ.CheckTokenViaRabbit(RabbitChannel, c.Request.Header.Get("Authorization"))
+	response, _ := verifyToken(RabbitChannel, c.Request.Header.Get("Authorization"))
 
 	account := response.Account
 	valid := response.Valid
@@ -160,8 +166,12 @@ func (h *CarHandler) CreateCar(c *gin.Context) {
 // @Failure 500 {object} map[string]string
 // @Router /car/{id} [put]
 func (h *CarHandler) UpdateCar(c *gin.Context) {
-
-	response, _ := rabbitMQ.CheckTokenViaRabbit(RabbitChannel, c.Request.Header.Get("Authorization"))
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(400, gin.H{"error": "invalid id"})
+		return
+	}
+	response, _ := verifyToken(RabbitChannel, c.Request.Header.Get("Authorization"))
 
 	account := response.Account
 	valid := response.Valid
@@ -173,12 +183,6 @@ func (h *CarHandler) UpdateCar(c *gin.Context) {
 		}
 
 		c.JSON(401, gin.H{"error": message})
-		return
-	}
-
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.JSON(400, gin.H{"error": "invalid id"})
 		return
 	}
 
@@ -211,6 +215,11 @@ func (h *CarHandler) UpdateCar(c *gin.Context) {
 // @Failure 500 {object} map[string]string
 // @Router /car/{id} [delete]
 func (h *CarHandler) DeleteCar(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(400, gin.H{"error": "invalid id"})
+	}
+
 	response, _ := rabbitMQ.CheckTokenViaRabbit(RabbitChannel, c.Request.Header.Get("Authorization"))
 
 	account := response.Account
@@ -219,10 +228,6 @@ func (h *CarHandler) DeleteCar(c *gin.Context) {
 	if !valid || !account.IsAdmin {
 		c.JSON(401, gin.H{"error": "invalid token"})
 		return
-	}
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.JSON(400, gin.H{"error": "invalid id"})
 	}
 	err = deleteCar(id)
 	if err != nil {
