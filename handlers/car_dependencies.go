@@ -3,7 +3,10 @@ package handlers
 import (
 	"SE-CarRentalService/db"
 	"SE-CarRentalService/rabbitMQ"
+	"SE-CarRentalService/services"
 )
+
+var GRCPConnection *services.ConverterClient
 
 var getCarsFromDatabase = db.GetCarsFromDatabase
 var getCarByID = db.GetCarByID

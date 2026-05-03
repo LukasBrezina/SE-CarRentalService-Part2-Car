@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"SE-CarRentalService/rabbitMQ"
-	"SE-CarRentalService/services"
 	"SE-CarRentalService/types"
 	"log"
 	"strconv"
@@ -15,10 +14,8 @@ type CarHandler struct{}
 
 var RabbitConnection *amqp.Connection
 var RabbitChannel *amqp.Channel
-var GRCPConnection *services.ConverterClient
 
-func NewCarHandler(grcpconnection *services.ConverterClient) *CarHandler {
-	GRCPConnection = grcpconnection
+func NewCarHandler() *CarHandler {
 	return &CarHandler{}
 }
 
