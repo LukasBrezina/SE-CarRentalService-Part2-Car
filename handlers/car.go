@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"SE-CarRentalService/rabbitMQ"
 	"SE-CarRentalService/types"
 	"log"
 	"strconv"
@@ -214,12 +213,15 @@ func (h *CarHandler) UpdateCar(c *gin.Context) {
 // @Failure 500 {object} map[string]string
 // @Router /car/{id} [delete]
 func (h *CarHandler) DeleteCar(c *gin.Context) {
+
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.JSON(400, gin.H{"error": "invalid id"})
+		return
 	}
 
-	response, _ := rabbitMQ.CheckTokenViaRabbit(RabbitChannel, c.Request.Header.Get("Authorization"))
+	log.Println("test")
+	response, _ := verifyToken(RabbitChannel, c.Request.Header.Get("Authorization"))
 
 	account := response.Account
 	valid := response.Valid
