@@ -21,11 +21,11 @@ func main() {
 
 	GRCPConnection := services.NewConverterClientRetry()
 	db.Connect(GRCPConnection)
-	rabbitConnection, rabbitChannel, err := rabbitMQ.Connect()
+	handlers.RabbitConnection, handlers.RabbitChannel, err = rabbitMQ.Connect()
 	handlers.GRCPConnection = GRCPConnection
 
 	if err != nil {
 		log.Println(err)
 	}
-	SetupRouter(rabbitConnection, rabbitChannel)
+	SetupRouter()
 }
