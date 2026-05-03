@@ -10,10 +10,10 @@ import (
 )
 
 var DATABASE *sql.DB
-var GRCPConnection *services.ConverterClient
+var GRPCConnection *services.ConverterClient
 
-func Connect(grcpConnection *services.ConverterClient) {
-	GRCPConnection = grcpConnection
+func Connect(grpcConnection *services.ConverterClient) {
+	GRPCConnection = grpcConnection
 	connStr := os.Getenv("DB_CONN")
 	if connStr == "" {
 		log.Println("DB_CONN is empty")

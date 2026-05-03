@@ -19,10 +19,10 @@ func main() {
 		log.Println(err)
 	}
 
-	GRCPConnection := services.NewConverterClientRetry()
-	db.Connect(GRCPConnection)
+	GRPCConnection := services.NewConverterClientRetry()
+	db.Connect(GRPCConnection)
 	handlers.RabbitConnection, handlers.RabbitChannel, err = rabbitMQ.Connect()
-	handlers.GRCPConnection = GRCPConnection
+	handlers.GRPCConnection = GRPCConnection
 
 	if err != nil {
 		log.Println(err)

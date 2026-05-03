@@ -71,7 +71,7 @@ func GetCarByID(id int) (types.Car, error) {
 func CreateCar(c types.CreateCarRequest, currency string) (types.Car, error) {
 	database := DATABASE
 	var newCar types.Car
-	price, _, err := GRCPConnection.ConvertCurrency(currency, float64(c.Price), "USD")
+	price, _, err := GRPCConnection.ConvertCurrency(currency, float64(c.Price), "USD")
 	if err != nil {
 		log.Fatal(err)
 		return types.Car{}, err
@@ -108,7 +108,7 @@ func UpdateCar(id int, c types.Car, account types.Account) error {
 	database := DATABASE
 	var result sql.Result
 	var err error
-	price, _, err := GRCPConnection.ConvertCurrency(account.Currency, float64(c.Price), "USD")
+	price, _, err := GRPCConnection.ConvertCurrency(account.Currency, float64(c.Price), "USD")
 
 	if err != nil {
 		log.Fatal(err)
